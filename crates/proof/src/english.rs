@@ -2,7 +2,7 @@
 //!
 //! 1. **Dictionaries folder**: a Hunspell `.aff`/`.dic` pair for the run's own English that the
 //!    user keeps for WordCraft ([`crate::hunspell::user_dirs`]: the folder set in the options,
-//!    `WORDCRAFT_DICTIONARIES`, WordCraft's own `dictionaries` folder).
+//!    `WORDCRAFT_DICTIONARIES`, the app's own `dictionaries` folder).
 //! 2. **Installed English pack**: reserved for Language packs (craft-libs#485, CP4.2).
 //! 3. **Embedded SCOWL**: the run's English's SCOWL dictionary (en-US, en-GB, en-AU or en-CA) embedded
 //!    from craft-i18n at build time ([`crate::scowl`]); a word it knows (British English: also
@@ -14,7 +14,7 @@
 //!    web). `COMPOUNDRULE` (ordinals) and `OCONV` are read; flag-based compounding is ignored
 //!    ([`crate::hunspell::load_english`]).
 //! 5. **Built-in word list**: [`WORDS`], the whole public-domain Moby word list compiled into
-//!    the crate (without its break points), with WordCraft's own supplement of modern words
+//!    the crate (without its break points), with the app's own supplement of modern words
 //!    ([`EXTRA`]) and the usual inflections. A word it doesn't know is misspelled. (The Moby list
 //!    embedded from craft-i18n is the same list; it is used for hyphenation only.)
 //!
