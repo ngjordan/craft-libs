@@ -7,7 +7,7 @@
 //! language's proofing tools.
 //!
 //! Search order: the folder set with [`set_dictionary_dir`], the directory in
-//! `WORDCRAFT_DICTIONARIES`, WordCraft's own `dictionaries` folder under the user's application
+//! `WORDCRAFT_DICTIONARIES`, the app's own `dictionaries` folder under the user's application
 //! data (on every desktop system), then an installed Language pack ([`crate::packs`]), then the
 //! usual system locations. On the web there are only the first and the packs.
 
@@ -74,7 +74,7 @@ pub fn search_dirs(lo_exts: Option<&[String]>) -> Vec<PathBuf> {
 }
 
 /// [`search_dirs`] in two tiers: the dictionaries folders (the one set with
-/// [`set_dictionary_dir`], `WORDCRAFT_DICTIONARIES` and WordCraft's own folder under the user's
+/// [`set_dictionary_dir`], `WORDCRAFT_DICTIONARIES` and the app's own folder under the user's
 /// application data), then the system's Hunspell and LibreOffice folders. Installed Language
 /// packs ([`crate::packs`]) are searched between the two.
 fn search_tiers(lo_exts: Option<&[String]>) -> (Vec<PathBuf>, Vec<PathBuf>) {
@@ -120,7 +120,7 @@ fn search_tiers(lo_exts: Option<&[String]>) -> (Vec<PathBuf>, Vec<PathBuf>) {
     } else {
         // Nor does one started from a desktop launcher (#1063).
         if let Some(data) = xdg_data_home(std::env::var_os("XDG_DATA_HOME"), home.as_deref()) {
-            dirs.push(data.join("wordcraft").join("dictionaries"));
+            dirs.push(data.join("docs").join("dictionaries"));
         }
         if let Some(h) = &home {
             system.push(h.join(".local/share/hunspell"));
@@ -235,16 +235,15 @@ pub fn user_candidates(names: &[&str]) -> Vec<(PathBuf, PathBuf)> {
 }
 
 /// The folders of [`search_dirs`] the user keeps dictionaries in for WordCraft: the one set with
-/// [`set_dictionary_dir`], `WORDCRAFT_DICTIONARIES`, and WordCraft's own `dictionaries` folder
+/// [`set_dictionary_dir`], `WORDCRAFT_DICTIONARIES`, and the app's own `dictionaries` folder
 /// under the user's application data. The rest are the system's (and LibreOffice's).
 pub fn user_dirs() -> Vec<PathBuf> {
     let extra = EXTRA_DIR.read().unwrap_or_else(std::sync::PoisonError::into_inner).clone();
     let env = std::env::var_os("WORDCRAFT_DICTIONARIES").filter(|v| !v.is_empty()).map(PathBuf::from);
-    let wordcraft_own = |d: &Path| {
-        d.file_name().is_some_and(|n| n == "dictionaries")
-            && d.parent().and_then(Path::file_name).is_some_and(|n| n.eq_ignore_ascii_case("wordcraft"))
+    let app_own = |d: &Path| {
+        d.file_name().is_some_and(|n| n == "dictionaries") && d.parent().and_then(Path::file_name).is_some_and(|n| n.eq_ignore_ascii_case("docs"))
     };
-    search_dirs(None).into_iter().filter(|d| Some(d) == extra.as_ref() || Some(d) == env.as_ref() || wordcraft_own(d)).collect()
+    search_dirs(None).into_iter().filter(|d| Some(d) == extra.as_ref() || Some(d) == env.as_ref() || app_own(d)).collect()
 }
 
 /// [`candidates`] in `dirs`.
@@ -727,7 +726,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&root);
     }
 
-    /// WordCraft's own dictionaries folder under the user's application data is searched on every
+    /// the app's own dictionaries folder under the user's application data is searched on every
     /// desktop system, after the setting and before the shared system locations (#1063).
     #[test]
     fn the_app_folder_comes_before_the_system_locations() {
@@ -745,7 +744,7 @@ mod tests {
         } else if cfg!(target_os = "macos") {
             ("Application Support/WordCraft/dictionaries", "/Library/Spelling")
         } else {
-            ("wordcraft/dictionaries", "/usr/share/hunspell")
+            ("docs/dictionaries", "/usr/share/hunspell")
         };
         assert!(matches!((at(app), at(shared)), (Some(app), Some(shared)) if app < shared), "{dirs:?}");
     }
@@ -967,7 +966,7 @@ mod tests {
     /// an `en_US` in the dictionaries folder doesn't beat a system `en_GB` for British English.
     #[test]
     fn candidates_go_name_by_name_across_the_folders() {
-        let base = std::env::temp_dir().join(format!("wordcraft-candidates-{}", std::process::id()));
+        let base = std::env::temp_dir().join(format!("craft-proof-candidates-{}", std::process::id()));
         let (folder, system) = (base.join("folder"), base.join("system"));
         for (dir, name) in [(&folder, "en_US"), (&system, "en_GB"), (&folder, "en-GB")] {
             std::fs::create_dir_all(dir).unwrap();
@@ -985,7 +984,7 @@ mod tests {
 
     #[test]
     fn finds_and_loads_a_pair_in_a_directory() {
-        let dir = std::env::temp_dir().join(format!("wordcraft-hunspell-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("craft-proof-hunspell-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         assert!(find_in(&dir, &["xx_XX"]).is_none(), "no files: nothing found");
         std::fs::write(dir.join("xx_XX.aff"), "SET UTF-8\nSFX A Y 1\nSFX A 0 y .\n").unwrap();
@@ -1000,7 +999,7 @@ mod tests {
 
     #[test]
     fn reads_are_bounded_and_regular_files_only() {
-        let dir = std::env::temp_dir().join(format!("wordcraft-hunspell-cap-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("craft-proof-hunspell-cap-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let aff = dir.join("xx.aff");
         std::fs::write(&aff, "SET UTF-8\n").unwrap();
@@ -1028,7 +1027,7 @@ mod tests {
     /// Turkish dictionary went through this reader it was read as UTF-8, which these bytes are not.
     #[test]
     fn a_turkish_dictionary_in_iso_8859_9_loads_from_disk() {
-        let dir = std::env::temp_dir().join(format!("wordcraft-hunspell-latin5-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("craft-proof-hunspell-latin5-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let (aff, dic) = (dir.join("tr_TR.aff"), dir.join("tr_TR.dic"));
         std::fs::write(&aff, b"SET ISO8859-9\nSFX 1 Y 2\nSFX 1 0 lar .\nSFX 1 0 \xfd .\nSFX 2 Y 1\nSFX 2 0 ler .\n").unwrap();

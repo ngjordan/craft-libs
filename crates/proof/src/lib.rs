@@ -1,4 +1,4 @@
-//! Proofing for the Craft Apps (moved from WordCraft's `wordcraft-proof`), per language. A run's language (its BCP 47 tag) picks the tools through
+//! Proofing for the Craft Apps (moved from the Docs app's proofing crate), per language. A run's language (its BCP 47 tag) picks the tools through
 //! [`ProofLang`]; the `*_in` functions take it, the older English-only ones remain.
 //!
 //! - **English** ([`ProofLang::En`]; also text with no language): spelling against the SCOWL
