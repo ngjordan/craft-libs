@@ -17,17 +17,19 @@ pub struct App {
     pub former_names: &'static [&'static str],
     /// Its 128 px PNG icon, for the menu entry written beside an AppImage. `None`: no icon.
     pub icon_png: Option<&'static [u8]>,
+    /// The bundle id: macOS bundle id, Flatpak id and Linux desktop-file id (`ph.pdf`).
+    pub bundle: &'static str,
 }
 
 impl App {
     /// An app with no former names and no icon.
     pub const fn new(id: &'static str, name: &'static str, tagline: &'static str, repo: &'static str) -> Self {
-        Self { id, name, tagline, repo, former_ids: &[], former_names: &[], icon_png: None }
+        Self { id, name, tagline, repo, former_ids: &[], former_names: &[], icon_png: None, bundle: "" }
     }
 
-    /// `ai.storyteller.<id>`: macOS bundle id, Flatpak id and Linux desktop-file id.
+    /// The bundle id: macOS bundle id, Flatpak id and Linux desktop-file id.
     pub fn bundle_id(&self) -> String {
-        format!("ai.storyteller.{}", self.id)
+        self.bundle.to_string()
     }
 
     pub fn releases_url(&self) -> String {
@@ -65,8 +67,12 @@ mod tests {
 
     #[test]
     fn former_names_follow_the_current_one() {
-        let pdf =
-            App { former_ids: &["printcraft"], former_names: &["PrintCraft"], ..App::new("pdfcraft", "PdfCraft", "PDFs", "storytold/pdfcraft") };
+        let pdf = App {
+            bundle: "ai.storyteller.pdfcraft",
+            former_ids: &["printcraft"],
+            former_names: &["PrintCraft"],
+            ..App::new("pdfcraft", "PdfCraft", "PDFs", "storytold/pdfcraft")
+        };
         assert_eq!(pdf.stems().collect::<Vec<_>>(), ["pdfcraft", "printcraft"]);
         assert_eq!(pdf.names().collect::<Vec<_>>(), ["PdfCraft", "PrintCraft"]);
         assert_eq!(pdf.bundle_id(), "ai.storyteller.pdfcraft");
