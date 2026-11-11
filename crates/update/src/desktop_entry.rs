@@ -14,7 +14,7 @@ use std::path::Path;
 use crate::App;
 
 /// The key that marks an entry as written by the launcher.
-pub const MARKER: &str = "X-ArtCraft-Launcher=true";
+pub const MARKER: &str = "X-Iridium-Launcher=true";
 
 /// The menu categories and the window class each app's own `.desktop` file declares.
 pub fn meta(app: &App) -> (&'static str, Option<&'static str>) {
@@ -148,7 +148,7 @@ mod tests {
             "[Desktop Entry]\nType=Application\nName=PhotoCraft\nComment={}\n\
              Exec=\"/home/ana/Applications/photocraft-0.6.0-linux-x86_64.AppImage\" %F\n\
              Icon=ai.storyteller.photocraft\nTerminal=false\nCategories=Graphics;2DGraphics;RasterGraphics;Photography;\n\
-             StartupWMClass=photocraft\nX-ArtCraft-Launcher=true\n",
+             StartupWMClass=photocraft\nX-Iridium-Launcher=true\n",
             app("photocraft").tagline
         );
         assert_eq!(text, expected);
