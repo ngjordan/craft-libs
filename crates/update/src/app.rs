@@ -23,6 +23,9 @@ pub struct App {
     /// Who makes it, shown as "by <developer>" in the update prompt. [`DEVELOPER`] unless the app
     /// says otherwise.
     pub developer: &'static str,
+    /// The vendor namespace of the bundle ids. The upstream apps ship under
+    /// `ai.storyteller`; a rebranded app sets its own (`ph`).
+    pub vendor: &'static str,
 }
 
 /// The developer of every app in the storytold organisation.
@@ -31,12 +34,15 @@ pub const DEVELOPER: &str = "ArtCraft";
 impl App {
     /// An app with no former names and no icon.
     pub const fn new(id: &'static str, name: &'static str, tagline: &'static str, repo: &'static str) -> Self {
-        Self { id, name, tagline, repo, former_ids: &[], former_names: &[], icon_png: None, accent: None, developer: DEVELOPER }
+        Self { id, name, tagline, repo, former_ids: &[], former_names: &[], icon_png: None, accent: None, developer: DEVELOPER, vendor: Self::VENDOR }
     }
 
-    /// `ai.storyteller.<id>`: macOS bundle id, Flatpak id and Linux desktop-file id.
+    /// The vendor namespace the upstream apps' bundle ids use.
+    pub const VENDOR: &'static str = "ai.storyteller";
+
+    /// `<vendor>.<id>`: macOS bundle id, Flatpak id and Linux desktop-file id.
     pub fn bundle_id(&self) -> String {
-        format!("ai.storyteller.{}", self.id)
+        format!("{}.{}", self.vendor, self.id)
     }
 
     pub fn releases_url(&self) -> String {

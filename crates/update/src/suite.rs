@@ -50,6 +50,17 @@ pub fn by_id(id: &str) -> Option<&'static App> {
     SUITE.iter().find(|a| a.id == id)
 }
 
+/// Every vendor namespace the suite's apps use, deduplicated.
+pub fn vendors() -> Vec<&'static str> {
+    let mut seen: Vec<&'static str> = Vec::new();
+    for a in &SUITE {
+        if !seen.contains(&a.vendor) {
+            seen.push(a.vendor);
+        }
+    }
+    seen
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
