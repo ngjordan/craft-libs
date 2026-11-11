@@ -29,7 +29,7 @@ pub struct App {
 }
 
 /// The developer of every app in the storytold organisation.
-pub const DEVELOPER: &str = "ArtCraft";
+pub const DEVELOPER: &str = "Iridium Technologies, Inc.";
 
 impl App {
     /// An app with no former names and no icon.
