@@ -14,7 +14,7 @@ use std::path::Path;
 use crate::App;
 
 /// The key that marks an entry as written by the launcher.
-pub const MARKER: &str = "X-ArtCraft-Launcher=true";
+pub const MARKER: &str = "X-Iridium-Launcher=true";
 
 /// The menu categories and the window class each app's own `.desktop` file declares.
 pub fn meta(app: &App) -> (&'static str, Option<&'static str>) {

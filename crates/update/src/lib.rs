@@ -78,7 +78,7 @@ fn offered_release(json: &str, repo: &str, current_version: &str) -> Result<Opti
 }
 
 #[cfg(test)]
-pub(crate) const TEST_AGENT: &str = "ArtCraft-Launcher-Test/0.0";
+pub(crate) const TEST_AGENT: &str = "Iridium-Launcher-Test/0.0";
 
 #[cfg(test)]
 mod offer_tests {
