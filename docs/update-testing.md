@@ -18,7 +18,7 @@ a network error or an app with no published newer release cannot produce an upda
 Use Help → Check for Updates to see errors that the startup check only logs.
 
 An app-specific setting takes priority over the legacy shared
-`ARTCRAFT_LAUNCHER_PRETEND_VERSION` setting. An invalid version falls back to the
+`IRIDIUM_LAUNCHER_PRETEND_VERSION` setting. An invalid version falls back to the
 compiled package version. Leave the variables unset for normal version detection.
 The restart helper clears both settings for the app so a newly installed copy reports
 its real version.
